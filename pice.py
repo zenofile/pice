@@ -127,13 +127,16 @@ class PiMon:
         return '{:>4.4f}V'.format(volts)
 
     def __str__(self) -> str:
-        row_format = "\033[1m{:>8}\033[0m" * 3 + '\n'
-        buf = row_format.format("Summary", 'min', 'max')
-        row_format = "{:<8}" + "{:>+8.1f}" * 2 + '\n'
-        buf += row_format.format("CPU (°C)", *self.mm_cpu_temp)
-        buf += row_format.format("GPU (°C)", *self.mm_gpu_temp)
-        row_format = "{:<8}" + "{:>8.4f}" * 2 + '\n'
-        buf += row_format.format("PKG (V)", *self.mm_pkg_volts)
+        row_fmt = '\033[1m{:>8}\033[0m' * 3 + '\n'
+        buf = row_fmt.format('Summary', 'min', 'max')
+        row_fmt = '{:<8}' + '{:>+8.1f}' * 2 + '\n'
+        buf += row_fmt.format('CPU (°C)', *self.mm_cpu_temp)
+        buf += row_fmt.format('GPU (°C)', *self.mm_gpu_temp)
+        row_fmt = '{:<8}' + '{:>8.4f}' * 2 + '\n'
+        buf += row_fmt.format('PKG ( V)', *self.mm_pkg_volts)
+
+        buf += '\n{:>10} {:d}\n'.format('Throttles:', self.nr_throttles)
+        buf += '{:>10} {:d}\n'.format('Samples:', self.nr_reads)
         return buf
 
     def __exit__(self, *args):
@@ -161,7 +164,7 @@ def main():
     mon = PiMon()
 
     def summary(obj: PiMon):
-        print("\n{}".format(obj))
+        print('\n\n{:}'.format(obj))
 
     def signal_handler(signal, frame):
         summary(mon)
@@ -174,14 +177,14 @@ def main():
         data = mon.read_data()
 
         if None not in data:
-            print("CPU: {}".format(PiMon.format_celsius(data[0])), end=" ")
-            print("\tGPU: {}".format(PiMon.format_celsius(data[1])), end=" ")
+            print('CPU: {:}'.format(PiMon.format_celsius(data[0])), end=' ')
+            print('\tGPU: {:}'.format(PiMon.format_celsius(data[1])), end=' ')
             if data[3] == True:
-                print("\tVcore: {}".format(PiMon.format_volts(data[2])),
+                print('\tVcore: {:}'.format(PiMon.format_volts(data[2])),
                       end=" ")
-                print("\tThrottled: True")
+                print('\tThrottled: True')
             else:
-                print("\tVcore: {}".format(PiMon.format_volts(data[2])))
+                print('\tVcore: {:}'.format(PiMon.format_volts(data[2])))
 
         if n == 0:
             summary(mon)
